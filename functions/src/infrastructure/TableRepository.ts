@@ -7,6 +7,7 @@ import {TableId} from "../domain/Table/TableId";
 import {inject} from "inversify";
 import {FirebaseAppConnection} from "./FirebaseConnection";
 import {TableFactory} from "../services/TableFactory";
+import {ITableDocument} from "./ITableDocument";
 
 @provide(SYMBOLS.TableRepository)
 export class TableRepository implements ITableRepository {
@@ -18,7 +19,16 @@ export class TableRepository implements ITableRepository {
     }
 
     add(table: Table): Promise<void> {
-        return Promise.resolve();
+        let tableDocument: ITableDocument = {
+            description: table.getDescription(),
+            isFree: table.getIsFree(),
+            updatedAt: table.getUpdatedAt().toISOString()
+        };
+        return Promise.resolve<any>(
+            this.firebaseApp.getDatabase()
+            .ref(TableRepository.NODE + "/" + table.getId().id)
+            .set(tableDocument)
+        );
     }
 
     remove(table: Table): Promise<void> {
@@ -31,12 +41,13 @@ export class TableRepository implements ITableRepository {
             let tables: Table[] = [];
             if (dataSnapshot.val()) {
                 dataSnapshot.forEach((childSnapshot: any) => {
-                    let childData = childSnapshot.val();
+                    let childData: ITableDocument = childSnapshot.val();
                     tables.push(
                         this.tableFactory.create(
                             childSnapshot.key,
                             childData.description,
-                            childData.isFree, new Date(childData.updatedAt)
+                            childData.isFree,
+                            new Date(childData.updatedAt)
                         )
                     );
                 });
@@ -47,6 +58,22 @@ export class TableRepository implements ITableRepository {
     }
 
     getById(tableId: TableId): Promise<Table|null> {
-        return Promise.resolve(null);
+        return Promise.resolve<any>(
+            this.firebaseApp.getDatabase().ref(TableRepository.NODE + "/" + tableId.id).once("value")
+        )
+        .then((dataSnapshot) => {
+            let table = null;
+            let tableDocument: ITableDocument|null = dataSnapshot.val();
+            if (tableDocument) {
+                table = this.tableFactory.create(
+                    dataSnapshot.key,
+                    tableDocument.description,
+                    tableDocument.isFree,
+                    new Date(tableDocument.updatedAt)
+                );
+            }
+
+            return table;
+        });
     }
 }

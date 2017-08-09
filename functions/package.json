@@ -3,6 +3,7 @@
   "description": "Cloud Functions for Firebase",
   "dependencies": {
     "bluebird": "^3.5.0",
+    "body-parser": "^1.17.2",
     "class-transformer": "^0.1.7",
     "class-validator": "^0.7.2",
     "express": "^4.15.3",
@@ -25,6 +26,7 @@
   ],
   "devDependencies": {
     "@types/bluebird": "^3.5.8",
+    "@types/body-parser": "^1.16.4",
     "@types/firebase": "^2.4.31",
     "@types/sinon": "^2.3.3",
     "sinon": "^3.0.0",
