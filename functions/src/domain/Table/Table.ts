@@ -7,8 +7,8 @@ export class Table {
 
     }
 
-    public getId(): TableId {
-        return this.id;
+    public getId(): string {
+        return this.id.id;
     }
 
     public getDescription(): string {

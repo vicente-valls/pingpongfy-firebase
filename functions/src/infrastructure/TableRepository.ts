@@ -26,13 +26,17 @@ export class TableRepository implements ITableRepository {
         };
         return Promise.resolve<any>(
             this.firebaseApp.getDatabase()
-            .ref(TableRepository.NODE + "/" + table.getId().id)
+            .ref(TableRepository.NODE + "/" + table.getId())
             .set(tableDocument)
         );
     }
 
     remove(table: Table): Promise<void> {
-        return Promise.resolve();
+        return Promise.resolve<void>(
+            this.firebaseApp.getDatabase()
+            .ref(TableRepository.NODE + "/" + table.getId())
+            .remove()
+        );
     }
 
     get(): Promise<Table[]> {

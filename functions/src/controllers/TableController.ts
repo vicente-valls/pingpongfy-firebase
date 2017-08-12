@@ -1,4 +1,7 @@
-import {TYPE, controller, httpGet, interfaces, response, httpPost, requestBody} from "inversify-express-utils";
+import {
+    TYPE, controller, httpGet, interfaces, response, httpPost, requestBody,
+    httpDelete, requestParam
+} from "inversify-express-utils";
 import {provideNamed} from "../../ioc/IoC";
 import TAGS from "../../ioc/Tags";
 import * as express from "express";
@@ -63,6 +66,23 @@ export class TableController extends BaseController implements interfaces.Contro
             } else {
                 this.handleInternalServerError(error, res);
             }
+        })
+        ;
+    }
+
+    // @todo implement authentication
+    @httpDelete("/:id")
+    deleteTable(
+        @requestParam("id") tableId: string,
+        @response() res: express.Response
+    ): Promise<void> {
+        return Promise.resolve<void>(this.tableService.deleteTable(tableId))
+        .then(() => {
+            let apiResponse = new ApiResponseDto(null);
+            res.status(200).json(this.classTransformer.classToPlain(apiResponse));
+        })
+        .catch((error: Error) => {
+            this.handleInternalServerError(error, res);
         })
         ;
     }

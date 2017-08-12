@@ -24,7 +24,7 @@ export class TableService {
         .then((tables: Table[]) => {
             return tables.map((table) => {
                 return new TableListItem(
-                    table.getId().id,
+                    table.getId(),
                     table.getDescription(),
                     table.getIsFree(),
                     table.getUpdatedAt()
@@ -34,12 +34,11 @@ export class TableService {
     }
 
     createTable(createTableDto: CreateTableRequestDto): Promise<TableListItem> {
-        let tableId = new TableId(createTableDto.id);
-        return this.tableRepository
-        .getById(tableId)
+        return Promise.resolve(new TableId(createTableDto.id))
+        .then((tableId) => this.tableRepository.getById(tableId))
         .then((tableFound) => {
             if (tableFound) {
-                throw new TableExistingError("table already exists id: " + tableId.id);
+                throw new TableExistingError("table already exists id: " + tableFound.getId());
             }
             let table = this.tableFactory.create(
                 createTableDto.id,
@@ -50,12 +49,22 @@ export class TableService {
             return this.tableRepository.add(table)
             .then(() => {
                 return new TableListItem(
-                    table.getId().id,
+                    table.getId(),
                     table.getDescription(),
                     table.getIsFree(),
                     table.getUpdatedAt()
                 );
             })
         })
+    }
+
+    deleteTable(id: string): Promise<void> {
+        return Promise.resolve(new TableId(id))
+        .then((tableId) => this.tableRepository.getById(tableId))
+        .then((table: Table|null) => {
+            if (table) {
+                return this.tableRepository.remove(table);
+            }
+        });
     }
 }
