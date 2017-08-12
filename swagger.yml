@@ -1,0 +1,181 @@
+swagger: '2.0'
+
+info:
+  version: "%version%"
+  title: PingPongfy API
+  description: |
+    Describes restful endpoints for the pingpongfy api.
+    ## Structure
+
+    ### The Response
+    Each successful response (`2xx` status code) follows same generic schema:
+    ```json
+    {
+        "data": {
+            ...
+        },
+        "errors": []
+    }
+    ```
+
+    On the other hand either client or server errors (`4xx-5xx`) follow this
+    schema:
+    ```json
+    {
+        "data": [],
+        "errors": [{
+            ...
+        }]
+    }
+    ```
+
+    #### DATA
+    The `data` key contains the information client requested.
+
+    #### ERRORS
+    The `errors` key contains `array` of request errors. Validation errors look like:
+    ```json
+    {
+        "data": [],
+        "errors": [
+            {
+                "code": "VALIDATION_ERROR",
+                "message": "",
+                "validationErrors": [
+                    {
+                        "property": "id",
+                        "value": "1",
+                        "constraints": {
+                            "length": "id must be longer than 5 characters"
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+    ```
+
+    While internal (5xx) errors:
+    ```json
+    {
+        "data": [],
+        "errors": [
+            {
+                "code": "INTERNAL_ERROR",
+                "message": "something unexpected happened",
+                "validationErrors": []
+            }
+        ]
+    }
+    ```
+
+    #### PAGINATION
+    Since the amount of objects returned is expected to be small,
+      no pagination functionality is needed.
+
+################################################################################
+#                  Host, Base Path, Schemes and Content Types                  #
+################################################################################
+basePath: /v1
+schemes:
+  - https
+produces:
+  - application/json
+consumes:
+  - application/json
+
+################################################################################
+#                                   Security                                   #
+################################################################################
+securityDefinitions:
+  XApiKey:
+      type: apiKey
+      description: |
+        The api key sent to client for the basic authentication
+      name: x-api-key
+      in: header
+
+################################################################################
+#                                   Paths                                      #
+################################################################################
+paths:
+  /tables:
+    get:
+      description: Get list of tables
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Table'
+    post:
+      description: Creates a new table
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/CreateTable"
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Table'
+  /tables/{tableId}:
+    patch:
+      description: updates table status of certain table
+      parameters:
+        - name: tableId
+          in: path
+          type: number
+          required: true
+        - name: body
+          in: body
+          schema:
+            $ref: "#/definitions/UpdateTable"
+      responses:
+        200:
+          description: OK
+
+################################################################################
+#                                 Definitions                                  #
+################################################################################
+definitions:
+  CreateTable:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+  Table:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      description:
+        type: string
+      isFree:
+        type: boolean
+      updatedAt:
+        type: string
+        description: iso8601 format
+  UpdateTable:
+    type: object
+    required:
+      - isFree
+    properties:
+      isFree:
+        type: boolean
