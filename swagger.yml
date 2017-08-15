@@ -169,9 +169,9 @@ definitions:
   CreateTable:
     type: object
     required:
-      - name
+      - id
     properties:
-      name:
+      id:
         type: string
       description:
         type: string
