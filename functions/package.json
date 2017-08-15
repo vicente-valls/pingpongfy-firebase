@@ -1,0 +1,40 @@
+{
+  "name": "pingpongfy-firebase",
+  "description": "Cloud Functions for Firebase",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "body-parser": "^1.17.2",
+    "class-transformer": "^0.1.7",
+    "class-validator": "^0.7.2",
+    "express": "^4.15.3",
+    "firebase-admin": "~4.2.1",
+    "firebase-functions": "^0.5.7",
+    "inversify": "^4.3.0",
+    "inversify-binding-decorators": "^3.0.0",
+    "inversify-express-utils": "^4.0.0",
+    "reflect-metadata": "^0.1.10",
+    "source-map-support": "^0.4.15"
+  },
+  "private": true,
+  "scripts": {
+    "postinstall": "node_modules/.bin/tsc",
+    "test-tslint": "node_modules/.bin/tslint -c tslint.json $(find ./ -type f -name '*.ts' -not -path './node_modules/*')",
+    "test": "npm run test-tslint"
+  },
+  "pre-commit": [
+    "test-tslint"
+  ],
+  "devDependencies": {
+    "@types/bluebird": "^3.5.8",
+    "@types/body-parser": "^1.16.4",
+    "@types/firebase": "^2.4.31",
+    "@types/sinon": "^2.3.3",
+    "sinon": "^3.0.0",
+    "tslint": "^4.5.1",
+    "typescript": "^2.4.2"
+  },
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "vicente-valls",
+  "license": "MIT"
+}

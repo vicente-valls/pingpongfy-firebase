@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "removeComments": false,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "target": "ES6",
+    "module": "commonjs",
+    "types": [
+      "reflect-metadata"
+    ]
+  },
+  "exclude": [
+      "node_modules",
+      "controllers",
+      "domain",
+      "dto",
+      "infrastructure",
+      "services"
+  ]
+}
