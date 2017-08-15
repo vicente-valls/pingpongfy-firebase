@@ -1,6 +1,6 @@
 import {
     TYPE, controller, httpGet, interfaces, response, httpPost, requestBody,
-    httpDelete, requestParam
+    httpDelete, requestParam, httpPut
 } from "inversify-express-utils";
 import {provideNamed} from "../../ioc/IoC";
 import TAGS from "../../ioc/Tags";
@@ -18,6 +18,9 @@ import {TableExistingError} from "../errors/TableExistingError";
 import {ApiErrorItemResponse} from "../dto/ApiErrorItemResponse";
 import {ValidationErrorItem} from "../dto/ValidationErrorItem";
 import {BaseController} from "./BaseController";
+import {UPDATE_TABLE, UpdateTableRequestParamConverter} from "../param-converters/UpdateTableRequestParamConverter";
+import {UpdateTableRequestDto} from "../dto/UpdateTableRequestDto";
+import {TableNonExistingError} from "../errors/TableNonExistingError";
 
 @provideNamed(TYPE.Controller, TAGS.TableController)
 @controller("/v1/tables")
@@ -83,6 +86,32 @@ export class TableController extends BaseController implements interfaces.Contro
         })
         .catch((error: Error) => {
             this.handleInternalServerError(error, res);
+        })
+        ;
+    }
+
+    // @todo implement authentication
+    @httpPut("/:id", bodyParser.json(), UpdateTableRequestParamConverter())
+    updateTable(
+        @requestParam("id") tableId: string,
+        @requestBody(UPDATE_TABLE) updateTableDto: UpdateTableRequestDto,
+        @response() res: express.Response
+    ): Promise<void> {
+        return Promise.resolve<TableListItem>(this.tableService.updateTable(tableId, updateTableDto))
+        .then((tableItem) => {
+            let apiResponse = new ApiResponseDto(tableItem);
+            res.status(200).json(this.classTransformer.classToPlain(apiResponse));
+        })
+        .catch((error: Error) => {
+            if (error instanceof TableNonExistingError) {
+                let apiResponse = new ApiResponseDto(
+                    [],
+                    [new ApiErrorItemResponse(ApiErrorItemResponse.RESOURCE_NOT_FOUND, error.message, [])]
+                );
+                res.status(404).json(apiResponse);
+            } else {
+                this.handleInternalServerError(error, res);
+            }
         })
         ;
     }

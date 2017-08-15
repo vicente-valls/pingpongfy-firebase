@@ -19,6 +19,16 @@ export class Table {
         return this.isFree;
     }
 
+    public book(): void {
+        this.isFree = false;
+        this.updatedAt = new Date();
+    }
+
+    public release(): void {
+        this.isFree = true;
+        this.updatedAt = new Date();
+    }
+
     public getUpdatedAt(): Date {
         return this.updatedAt;
     }

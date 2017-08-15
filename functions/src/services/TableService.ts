@@ -9,6 +9,8 @@ import {CreateTableRequestDto} from "../dto/CreateTableRequestDto";
 import {TableId} from "../domain/Table/TableId";
 import {TableExistingError} from "../errors/TableExistingError";
 import {TableFactory} from "./TableFactory";
+import {UpdateTableRequestDto} from "../dto/UpdateTableRequestDto";
+import {TableNonExistingError} from "../errors/TableNonExistingError";
 
 @provide(SYMBOLS.TableService)
 export class TableService {
@@ -66,5 +68,29 @@ export class TableService {
                 return this.tableRepository.remove(table);
             }
         });
+    }
+
+    updateTable(id: string, updateTableRequestDto: UpdateTableRequestDto): Promise<TableListItem> {
+        return Promise.resolve(new TableId(id))
+        .then((tableId) => this.tableRepository.getById(tableId))
+        .then((tableFound) => {
+            if (!tableFound) {
+                throw new TableNonExistingError("table does not exist id: " + id);
+            }
+            if (updateTableRequestDto.isFree) {
+                tableFound.release();
+            } else {
+                tableFound.book();
+            }
+            return this.tableRepository.add(tableFound)
+            .then(() => {
+                return new TableListItem(
+                    tableFound.getId(),
+                    tableFound.getDescription(),
+                    tableFound.getIsFree(),
+                    tableFound.getUpdatedAt()
+                );
+            })
+        })
     }
 }

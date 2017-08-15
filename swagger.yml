@@ -130,7 +130,8 @@ paths:
                 items:
                   $ref: '#/definitions/Table'
   /tables/{tableId}:
-    patch:
+    # patch method would make more since but firebase does not support it though
+    put:
       description: updates table status of certain table
       parameters:
         - name: tableId
@@ -144,6 +145,13 @@ paths:
       responses:
         200:
           description: OK
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/definitions/Table'
 
 ################################################################################
 #                                 Definitions                                  #
