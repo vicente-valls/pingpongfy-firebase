@@ -152,7 +152,16 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/Table'
-
+    delete:
+      description: deletes a table
+      parameters:
+        - name: tableId
+          in: path
+          type: number
+          required: true
+      responses:
+        200:
+          description: OK
 ################################################################################
 #                                 Definitions                                  #
 ################################################################################
