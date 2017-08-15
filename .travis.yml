@@ -1,0 +1,21 @@
+language: node_js
+
+sudo: required
+
+node_js:
+    - "6.11.1"
+
+matrix:
+    fast_finish: true
+
+install:
+  - cd $TRAVIS_BUILD_DIR/functions
+  - npm install
+
+script:
+  - npm test
+
+cache:
+    npm: true
+    directories:
+        - functions/node_modules
