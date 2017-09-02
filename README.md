@@ -20,8 +20,14 @@ $ npm test
 ```
 
 ## Deployment
+
+#### Development
+
 By default you will deploy the api into your dev env as defined on `.firebaserc`
 ```
 $ firebase login
 $ firebase deploy --only functions:api
 ```
+
+#### Staging & Production
+Releases with prefix `stg` or `prod` deploy api automatically from travis.

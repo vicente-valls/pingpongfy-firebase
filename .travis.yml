@@ -1,3 +1,7 @@
+env:
+  global:
+    secure: "MPoeYtGbo5WBEi/tUXHyUpswe2yEYVzOCIfkz7IqvwTPqh/Eus2m1zEqNLKwNDJ3EIVgJq9vDKowrYWucTxffwBa3cPL/91D0Yw6D3i7JfnHtG6EvkHWnjBwTfHzv6gd9ZkotewgBrfdWSvNJAasS1Tcw0qI1y58AVzfOb4d80IVibUsqxkYBpJ53G5qnhu26fQA5kKA6OLIQZrMNri8+djaNSLlXUM89eZaiBl5qXg06eXJ/bFJ1facMIvNWBYmQeKIRw4AiiHVG7fqY3zbSp0p9EPIr4TMOK8FMcMGcufnQMHQT6Xkbv7K/IkXbXD31f+0LpTyL1zFzqY6zSgOYKz85PPtXEN3okIUPdNn4jzIgNdlGoLQ2r1ibzXLscUTiGhm5jfyNKQDbpNXPFGFMJaDIqc8zr021gGKezHRGMZL6u/GVRaOwvsoa+WZ2s4TOwQQiylH99ht2jdEm4CKFu2aQO4VVFeQh0zlaIeoGhCXh+DqIrkzLirjrBXTh1bGlgigdF8o+pL78SKbUwX6HntFbTVocO9GSFyW5wj9pFYr8QJnThiqbsyOTcJsTmT67DcKONv+chPXZ3Q9WibkPGugK384sQvbNG2aLI84+MR5/AkkbTAN20wHgyByx7Rytg6y2BrLKRIc2MbRh8KUU3mbRzTKay0qNqUxOQapJXM="
+
 language: node_js
 
 sudo: required
@@ -19,3 +23,15 @@ cache:
     npm: true
     directories:
         - functions/node_modules
+
+before_deploy:
+  - npm install -g firebase-tools
+
+# firebase provider not working on travis
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: firebase deploy -P pingpongfy-staging --only functions:api --token "$FIREBASE_TOKEN"
+    on:
+      tags: true
+      condition: ${TRAVIS_TAG} = "stg"*
