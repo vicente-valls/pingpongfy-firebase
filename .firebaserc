@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "pingpongfy-dev"
+    "default": "pingpongfy-dev",
+    "staging": "pingpongfy-staging"
   }
 }
