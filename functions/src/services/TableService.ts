@@ -11,9 +11,10 @@ import {TableExistingError} from "../errors/TableExistingError";
 import {TableFactory} from "./TableFactory";
 import {UpdateTableRequestDto} from "../dto/UpdateTableRequestDto";
 import {TableNonExistingError} from "../errors/TableNonExistingError";
+import {ITableService} from "./ITableService";
 
 @provide(SYMBOLS.TableService)
-export class TableService {
+export class TableService implements ITableService {
     constructor(
         @inject(SYMBOLS.TableRepository) private tableRepository: ITableRepository,
         @inject(SYMBOLS.TableFactory) private tableFactory: TableFactory
@@ -25,10 +26,7 @@ export class TableService {
         .get()
         .then((tables: Table[]) => {
             return tables.map((table) => {
-                return new TableListItem(
-                    table.getId(),
-                    table.getDescription(),
-                    table.getIsFree(),
+                return new TableListItem(table.getId(), table.getDescription(), table.getIsFree(),
                     table.getUpdatedAt()
                 );
             });
@@ -42,18 +40,10 @@ export class TableService {
             if (tableFound) {
                 throw new TableExistingError("table already exists id: " + tableFound.getId());
             }
-            let table = this.tableFactory.create(
-                createTableDto.id,
-                createTableDto.description,
-                true,
-                new Date()
-            );
+            let table = this.tableFactory.create(createTableDto.id, createTableDto.description, true, new Date());
             return this.tableRepository.add(table)
             .then(() => {
-                return new TableListItem(
-                    table.getId(),
-                    table.getDescription(),
-                    table.getIsFree(),
+                return new TableListItem(table.getId(), table.getDescription(), table.getIsFree(),
                     table.getUpdatedAt()
                 );
             })
@@ -84,10 +74,7 @@ export class TableService {
             }
             return this.tableRepository.add(tableFound)
             .then(() => {
-                return new TableListItem(
-                    tableFound.getId(),
-                    tableFound.getDescription(),
-                    tableFound.getIsFree(),
+                return new TableListItem(tableFound.getId(), tableFound.getDescription(), tableFound.getIsFree(),
                     tableFound.getUpdatedAt()
                 );
             })

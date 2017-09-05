@@ -6,11 +6,6 @@ import SYMBOLS from "../../ioc/Symbols";
 @provide(SYMBOLS.TableFactory)
 export class TableFactory {
     create(reference: string, description: string, isFree: boolean, updatedAt: Date) {
-        return new Table(
-            new TableId(reference),
-            description,
-            isFree,
-            updatedAt
-        );
+        return new Table(new TableId(reference), description, isFree, updatedAt);
     }
 }
