@@ -18,19 +18,7 @@ export function UpdateTableRequestParamConverter(): express.RequestHandler {
                 req.body[UPDATE_TABLE] = requestDto;
                 next();
             } else {
-                let validationErrorItems = validationErrors.map((validationError: ValidationError) => {
-                    return new ValidationErrorItem(
-                        validationError.property,
-                        validationError.value,
-                        validationError.constraints
-                    );
-                });
-                res.status(400).json(
-                    new ApiResponseDto(
-                        [],
-                        [new ApiErrorItemResponse(ApiErrorItemResponse.VALIDATION_ERROR, "", validationErrorItems)]
-                    )
-                );
+                handleResponseForValidationErrors(validationErrors, res);
             }
         } catch (error) {
             res.status(400).json(
@@ -41,4 +29,17 @@ export function UpdateTableRequestParamConverter(): express.RequestHandler {
             );
         }
     };
+}
+
+function handleResponseForValidationErrors(validationErrors: ValidationError[], res: express.Response): void {
+    let validationErrorItems = validationErrors.map((validationError: ValidationError) => {
+        return new ValidationErrorItem(validationError.property, validationError.value,
+            validationError.constraints
+        );
+    });
+    res.status(400).json(
+        new ApiResponseDto(
+            [], [new ApiErrorItemResponse(ApiErrorItemResponse.VALIDATION_ERROR, "", validationErrorItems)]
+        )
+    );
 }
