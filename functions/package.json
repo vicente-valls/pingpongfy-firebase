@@ -20,7 +20,7 @@
     "postinstall": "node_modules/.bin/tsc",
     "test-tslint": "node_modules/.bin/tslint -c tslint.json $(find ./ -type f -name '*.ts' -not -path './node_modules/*')",
     "test-unit": "node_modules/.bin/mocha --opts test/unit $(find ./test/unit -path \"*.js\")",
-    "test": "npm run test-tslint"
+    "test": "npm run test-tslint && npm run test-unit"
   },
   "pre-commit": [
     "test-tslint"
