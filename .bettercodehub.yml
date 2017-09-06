@@ -1,0 +1,6 @@
+exclude:
+- /functions/index.ts
+- /functions/ioc/.*
+component_depth: 4
+languages:
+- typescript

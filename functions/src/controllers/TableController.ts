@@ -5,7 +5,6 @@ import {
 import {provideNamed} from "../../ioc/IoC";
 import TAGS from "../../ioc/Tags";
 import * as express from "express";
-import {TableService} from "../services/TableService";
 import {inject} from "inversify";
 import {ApiResponseDto} from "../dto/ApiResponseDto";
 import SYMBOLS from "../../ioc/Symbols";
@@ -21,12 +20,13 @@ import {BaseController} from "./BaseController";
 import {UPDATE_TABLE, UpdateTableRequestParamConverter} from "../param-converters/UpdateTableRequestParamConverter";
 import {UpdateTableRequestDto} from "../dto/UpdateTableRequestDto";
 import {TableNonExistingError} from "../errors/TableNonExistingError";
+import {ITableService} from "../services/ITableService";
 
 @provideNamed(TYPE.Controller, TAGS.TableController)
 @controller("/v1/tables")
 export class TableController extends BaseController implements interfaces.Controller {
     constructor(
-        @inject(SYMBOLS.TableService) private tableService: TableService,
+        @inject(SYMBOLS.TableService) private tableService: ITableService,
         @inject(SYMBOLS.ClassTransformer) private classTransformer: ClassTransformer
     ) {
         super();
