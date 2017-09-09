@@ -5,6 +5,8 @@ const SYMBOLS = {
     Validator: Symbol("Validator"),
     FirebaseAppConnection: Symbol("FirebaseAppConnection"),
     TableFactory: Symbol("TableFactory"),
+    DtoValidator: Symbol("DtoValidator"),
+    ParamConverter: Symbol("ParamConverter"),
 };
 
 export default SYMBOLS;

@@ -23,9 +23,10 @@ $ npm test
 
 #### Development
 
-By default you will deploy the api into your dev env as defined on `.firebaserc`
+While working on the project you can release to your dev env as defined in: `.firebaserc`
 ```
 $ firebase login
+$ firebase use development
 $ firebase deploy --only functions:api
 ```
 

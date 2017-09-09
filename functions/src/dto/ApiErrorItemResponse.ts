@@ -1,4 +1,4 @@
-import {ValidationErrorItem} from "./ValidationErrorItem";
+import {ValidationErrorItem} from "../errors/ValidationErrorItem";
 
 export class ApiErrorItemResponse {
     static RESOURCE_NOT_FOUND = "RESOURCE_NOT_FOUND";
