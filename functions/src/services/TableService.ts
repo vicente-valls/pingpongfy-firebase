@@ -12,12 +12,14 @@ import {TableFactory} from "./TableFactory";
 import {UpdateTableRequestDto} from "../dto/UpdateTableRequestDto";
 import {TableNonExistingError} from "../errors/TableNonExistingError";
 import {ITableService} from "./ITableService";
+import {IDtoValidator} from "./IDtoValidator";
 
 @provide(SYMBOLS.TableService)
 export class TableService implements ITableService {
     constructor(
         @inject(SYMBOLS.TableRepository) private tableRepository: ITableRepository,
-        @inject(SYMBOLS.TableFactory) private tableFactory: TableFactory
+        @inject(SYMBOLS.TableFactory) private tableFactory: TableFactory,
+        @inject(SYMBOLS.DtoValidator) private dtoValidator: IDtoValidator
     ) {
     }
 
@@ -34,8 +36,8 @@ export class TableService implements ITableService {
     }
 
     createTable(createTableDto: CreateTableRequestDto): Promise<TableListItem> {
-        return Promise.resolve(new TableId(createTableDto.id))
-        .then((tableId) => this.tableRepository.getById(tableId))
+        return this.dtoValidator.validate<CreateTableRequestDto>(createTableDto)
+        .then(() => this.tableRepository.getById(new TableId(createTableDto.id)))
         .then((tableFound) => {
             if (tableFound) {
                 throw new TableExistingError("table already exists id: " + tableFound.getId());
@@ -51,8 +53,7 @@ export class TableService implements ITableService {
     }
 
     deleteTable(id: string): Promise<void> {
-        return Promise.resolve(new TableId(id))
-        .then((tableId) => this.tableRepository.getById(tableId))
+        return this.tableRepository.getById(new TableId(id))
         .then((table: Table|null) => {
             if (table) {
                 return this.tableRepository.remove(table);
@@ -61,8 +62,8 @@ export class TableService implements ITableService {
     }
 
     updateTable(id: string, updateTableRequestDto: UpdateTableRequestDto): Promise<TableListItem> {
-        return Promise.resolve(new TableId(id))
-        .then((tableId) => this.tableRepository.getById(tableId))
+        return this.dtoValidator.validate<UpdateTableRequestDto>(updateTableRequestDto)
+        .then(() => this.tableRepository.getById(new TableId(id)))
         .then((tableFound) => {
             if (!tableFound) {
                 throw new TableNonExistingError("table does not exist id: " + id);

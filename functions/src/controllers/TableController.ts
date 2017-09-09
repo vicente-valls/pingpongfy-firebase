@@ -2,7 +2,7 @@ import {
     TYPE, controller, httpGet, interfaces, response, httpPost, requestBody,
     httpDelete, requestParam, httpPut
 } from "inversify-express-utils";
-import {provideNamed} from "../../ioc/IoC";
+import {container, provideNamed} from "../../ioc/IoC";
 import TAGS from "../../ioc/Tags";
 import * as express from "express";
 import {inject} from "inversify";
@@ -11,20 +11,23 @@ import SYMBOLS from "../../ioc/Symbols";
 import {TableListItem} from "../dto/TableListItem";
 import {ClassTransformer} from "class-transformer";
 import * as bodyParser from "body-parser";
-import {CREATE_TABLE, CreateTableRequestParamConverter} from "../param-converters/CreateTableRequestParamConverter";
 import {CreateTableRequestDto} from "../dto/CreateTableRequestDto";
 import {TableExistingError} from "../errors/TableExistingError";
 import {ApiErrorItemResponse} from "../dto/ApiErrorItemResponse";
-import {ValidationErrorItem} from "../dto/ValidationErrorItem";
+import {ValidationErrorItem} from "../errors/ValidationErrorItem";
 import {BaseController} from "./BaseController";
-import {UPDATE_TABLE, UpdateTableRequestParamConverter} from "../param-converters/UpdateTableRequestParamConverter";
 import {UpdateTableRequestDto} from "../dto/UpdateTableRequestDto";
 import {TableNonExistingError} from "../errors/TableNonExistingError";
 import {ITableService} from "../services/ITableService";
+import {ParamConverter} from "../param-converters/ParamConverter";
+import {InvalidDtoError} from "../errors/InvalidDtoError";
 
 @provideNamed(TYPE.Controller, TAGS.TableController)
 @controller("/v1/tables")
 export class TableController extends BaseController implements interfaces.Controller {
+    static UPDATE_TABLE_PARAM_NAME = "updateTable";
+    static CREATE_TABLE_PARAM_NAME = "createTable";
+
     constructor(
         @inject(SYMBOLS.TableService) private tableService: ITableService,
         @inject(SYMBOLS.ClassTransformer) private classTransformer: ClassTransformer
@@ -47,9 +50,12 @@ export class TableController extends BaseController implements interfaces.Contro
     }
 
     // @todo implement authentication
-    @httpPost("/", bodyParser.json(), CreateTableRequestParamConverter())
+    @httpPost("/", bodyParser.json(), container.get<ParamConverter>(SYMBOLS.ParamConverter).convert(
+            TableController.CREATE_TABLE_PARAM_NAME, CreateTableRequestDto
+        )
+    )
     createTable(
-        @requestBody(CREATE_TABLE) createTableDto: CreateTableRequestDto,
+        @requestBody(TableController.CREATE_TABLE_PARAM_NAME) createTableDto: CreateTableRequestDto,
         @response() res: express.Response
     ): Promise<void> {
         return Promise.resolve<TableListItem>(this.tableService.createTable(createTableDto))
@@ -66,6 +72,8 @@ export class TableController extends BaseController implements interfaces.Contro
                     ])]
                 );
                 res.status(400).json(apiResponse);
+            } else if (error instanceof InvalidDtoError) {
+                this.handleValidationErrors(error, res);
             } else {
                 this.handleInternalServerError(error, res);
             }
@@ -91,10 +99,14 @@ export class TableController extends BaseController implements interfaces.Contro
     }
 
     // @todo implement authentication
-    @httpPut("/:id", bodyParser.json(), UpdateTableRequestParamConverter())
+    @httpPut("/:id", bodyParser.json(),
+        container.get<ParamConverter>(SYMBOLS.ParamConverter).convert(
+            TableController.UPDATE_TABLE_PARAM_NAME, UpdateTableRequestDto
+        )
+    )
     updateTable(
         @requestParam("id") tableId: string,
-        @requestBody(UPDATE_TABLE) updateTableDto: UpdateTableRequestDto,
+        @requestBody(TableController.UPDATE_TABLE_PARAM_NAME) updateTableDto: UpdateTableRequestDto,
         @response() res: express.Response
     ): Promise<void> {
         return Promise.resolve<TableListItem>(this.tableService.updateTable(tableId, updateTableDto))
@@ -109,6 +121,8 @@ export class TableController extends BaseController implements interfaces.Contro
                     [new ApiErrorItemResponse(ApiErrorItemResponse.RESOURCE_NOT_FOUND, error.message, [])]
                 );
                 res.status(404).json(apiResponse);
+            } else if (error instanceof InvalidDtoError) {
+                this.handleValidationErrors(error, res);
             } else {
                 this.handleInternalServerError(error, res);
             }
