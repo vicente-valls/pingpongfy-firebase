@@ -18,17 +18,3 @@ $ cd functions && npm install
 ```
 $ npm test
 ```
-
-## Deployment
-
-#### Development
-
-While working on the project you can release to your dev env as defined in: `.firebaserc`
-```
-$ firebase login
-$ firebase use development
-$ firebase deploy --only functions:api
-```
-
-#### Staging & Production
-Releases with prefix `stg` or `prod` deploy api automatically from travis.
